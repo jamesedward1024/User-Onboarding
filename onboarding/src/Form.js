@@ -11,8 +11,37 @@ export default function Form() {
         password: "",
         terms: ""
     })
-    const formSubmit = e => { }
-    const handleChange = e => { }
+    const [user, setUser] = useState([])
+
+    const formSubmit = e => {
+        e.preventDefault();
+        axios
+            .post('https://reqres.in/api/users', formState)
+            .then(response => {
+                setUser(response.data);
+
+                setFormState({
+                    firstName: "",
+                    lastName: "",
+                    emailAddress: "",
+                    password: "",
+                    terms: ""
+                });
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }
+
+    const handleChange = e => {
+        e.persist();
+        const newValues = {
+            ...formState,
+            [e.target.name]:
+                e.target.type === 'checkbox' ? e.target.checked : e.target.value
+        };
+        setFormState(newValues);
+    }
 
     return (
         <form onSubmit={formSubmit}>
@@ -32,6 +61,14 @@ export default function Form() {
                     value={formState.lastName}
                     onChange={handleChange} />
             </label>
+            <label htmlFor="emailAddress">
+                Email Address
+                 <input
+                    type="email"
+                    name="emailAddress"
+                    checked={formState.emailAddress}
+                    onChange={handleChange} />
+            </label>
             <label htmlFor="password">
                 Password
                  <input
@@ -49,7 +86,7 @@ export default function Form() {
                     onChange={handleChange} />
             </label>
             <button type="submit">Submit</button>
-
+            <pre>{JSON.stringify(user, null, 2)}</pre>
         </form>
     )
 }
